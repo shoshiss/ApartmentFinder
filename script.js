@@ -1,5 +1,4 @@
 class Property {
-
     constructor(address) {
         this.address = address;
     }
@@ -9,13 +8,7 @@ class Apartment extends Property {
 
     #price;
 
-    constructor(
-        address,
-        area,
-        rooms,
-        floor,
-        price
-    ) {
+    constructor(address, area, rooms, floor, price) {
 
         super(address);
 
@@ -31,6 +24,7 @@ class Apartment extends Property {
         if (price > 0) {
             this.#price = price;
         }
+
     }
 
     getPrice() {
@@ -39,6 +33,8 @@ class Apartment extends Property {
 }
 
 let apartments = [];
+
+loadApartments();
 
 function addApartment() {
 
@@ -65,7 +61,7 @@ function addApartment() {
         price <= 0
     ) {
 
-        alert("Заповніть поля правильно");
+        alert("Заповніть усі поля правильно");
 
         return;
     }
@@ -80,6 +76,8 @@ function addApartment() {
         );
 
     apartments.push(apartment);
+
+    saveApartments();
 
     showApartments(apartments);
 
@@ -99,39 +97,51 @@ function clearForm() {
 
 function showApartments(list) {
 
-    const body =
-        document.getElementById("tableBody");
+    const cards =
+        document.getElementById("cards");
 
-    body.innerHTML = "";
+    cards.innerHTML = "";
 
-    for (let i = 0; i < list.length; i++) {
+    list.forEach((apartment, index) => {
 
-        body.innerHTML += `
-        <tr>
-            <td>${list[i].address}</td>
-            <td>${list[i].area}</td>
-            <td>${list[i].rooms}</td>
-            <td>${list[i].floor}</td>
-            <td>${list[i].getPrice()} $</td>
+        cards.innerHTML += `
+        
+        <div class="card">
 
-            <td>
-                <button
-                class="deleteBtn"
-                onclick="deleteApartment(${i})">
+            <img
+            src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+            alt="Квартира">
 
-                    Видалити
+            <h3>${apartment.address}</h3>
 
-                </button>
-            </td>
+            <p>📐 ${apartment.area} м²</p>
 
-        </tr>
+            <p>🛏 ${apartment.rooms} кімнат</p>
+
+            <p>🏢 ${apartment.floor} поверх</p>
+
+            <p class="price">
+                ${apartment.price || apartment._price || apartment.getPrice?.() || ""}
+                $
+            </p>
+
+            <button
+            onclick="deleteApartment(${index})">
+
+                Видалити
+
+            </button>
+
+        </div>
         `;
-    }
+    });
 }
 
 function deleteApartment(index) {
 
     apartments.splice(index, 1);
+
+    saveApartments();
 
     showApartments(apartments);
 
@@ -142,24 +152,22 @@ function filterApartments() {
 
     const maxPrice =
         Number(
-            document.getElementById(
-                "maxPrice"
-            ).value
+            document.getElementById("maxPrice").value
         );
 
     const result = [];
 
-    for (let apartment of apartments) {
+    apartments.forEach(apartment => {
 
-        if (
-            apartment.getPrice()
-            <=
-            maxPrice
-        ) {
+        const price =
+            apartment.price ||
+            apartment._price ||
+            apartment.getPrice?.();
 
+        if (price <= maxPrice) {
             result.push(apartment);
         }
-    }
+    });
 
     showApartments(result);
 }
@@ -177,28 +185,82 @@ function findCheapest() {
 
     let cheapest = apartments[0];
 
-    for (let apartment of apartments) {
+    apartments.forEach(apartment => {
 
-        if (
-            apartment.getPrice()
-            <
-            cheapest.getPrice()
-        ) {
+        const currentPrice =
+            apartment.price ||
+            apartment._price ||
+            apartment.getPrice?.();
 
+        const cheapPrice =
+            cheapest.price ||
+            cheapest._price ||
+            cheapest.getPrice?.();
+
+        if (currentPrice < cheapPrice) {
             cheapest = apartment;
         }
-    }
+    });
 
     document.getElementById(
         "bestApartment"
     ).innerHTML =
-        "Найдешевша квартира: "
-        +
-        cheapest.address
-        +
-        " | "
-        +
-        cheapest.getPrice()
-        +
-        " $";
+        `
+        🏆 Найдешевша квартира:
+        <br>
+        ${cheapest.address}
+        <br>
+        ${cheapest.price || cheapest._price || cheapest.getPrice?.()} $
+        `;
+}
+
+function saveApartments() {
+
+    const data = apartments.map(a => ({
+        address: a.address,
+        area: a.area,
+        rooms: a.rooms,
+        floor: a.floor,
+        price: a.getPrice()
+    }));
+
+    localStorage.setItem(
+        "apartments",
+        JSON.stringify(data)
+    );
+}
+
+function loadApartments() {
+
+    const saved =
+        localStorage.getItem("apartments");
+
+    if (saved) {
+
+        const data =
+            JSON.parse(saved);
+
+        apartments = [];
+
+        data.forEach(a => {
+
+            apartments.push(
+                new Apartment(
+                    a.address,
+                    a.area,
+                    a.rooms,
+                    a.floor,
+                    a.price
+                )
+            );
+        });
+
+        setTimeout(() => {
+
+            showApartments(apartments);
+
+            findCheapest();
+
+        }, 100);
+    }
 }
