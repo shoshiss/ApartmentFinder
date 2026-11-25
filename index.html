@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система підбору квартир</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🏠 Система підбору квартир</h1>
+
+    <div class="form">
+
+        <input type="text" id="address" placeholder="Адреса">
+
+        <input type="number" id="area" placeholder="Площа (м²)">
+
+        <input type="number" id="rooms" placeholder="Кількість кімнат">
+
+        <input type="number" id="floor" placeholder="Поверх">
+
+        <input type="number" id="price" placeholder="Ціна ($)">
+
+        <button onclick="addApartment()">
+            Додати квартиру
+        </button>
+
+    </div>
+
+    <div class="search">
+
+        <h2>Пошук за бюджетом</h2>
+
+        <input type="number"
+               id="maxPrice"
+               placeholder="Максимальна ціна">
+
+        <button onclick="filterApartments()">
+            Знайти
+        </button>
+
+    </div>
+
+    <h2>Список квартир</h2>
+
+    <table>
+
+        <thead>
+        <tr>
+            <th>Адреса</th>
+            <th>Площа</th>
+            <th>Кімнати</th>
+            <th>Поверх</th>
+            <th>Ціна</th>
+            <th>Дія</th>
+        </tr>
+        </thead>
+
+        <tbody id="tableBody">
+
+        </tbody>
+
+    </table>
+
+    <div id="bestApartment">
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
